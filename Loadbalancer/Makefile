@@ -1,5 +1,5 @@
 CLANG = clang
-CFLAGS = -g -O2 -Wall -Wextra
+CFLAGS = -g -O2 -Wall -Wextra -Wno-unknown-attributes
 TARGET = xdp_lbr
 SEC = xdp
 
