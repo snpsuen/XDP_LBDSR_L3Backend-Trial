@@ -2,6 +2,8 @@
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_endian.h>
 
+#define __force __attribute__((force))
+
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
 	__uint(map_flags, BPF_F_NO_PREALLOC);
