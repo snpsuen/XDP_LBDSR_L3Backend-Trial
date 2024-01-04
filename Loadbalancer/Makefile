@@ -1,6 +1,6 @@
 CLANG = clang
 CFLAGS = -g -O2 -Wall -Wextra
-TARGET = simplelbdsr
+TARGET = xdp_lbr
 SEC = xdp
 
 BPF_TARGET = ${TARGET:=.bpf}
