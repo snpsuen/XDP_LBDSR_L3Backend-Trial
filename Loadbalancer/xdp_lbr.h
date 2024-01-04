@@ -12,6 +12,14 @@
 #define ETH_P_IP 0x0800
 #endif
 
+#ifndef AF_INET
+#define AF_INET 2
+#endif
+
+#ifndef ETH_ALEN
+#define ETH_ALEN 6
+#endif
+
 #ifndef BPF_ANY
 #define BPF_ANY 0
 #endif
