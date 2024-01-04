@@ -1,7 +1,6 @@
-#include "vmlinux0.h"
+#include "xdp_lbr.h"
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_endian.h>
-#include "xdp_lbr.h"
 
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
