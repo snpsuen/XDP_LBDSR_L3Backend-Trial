@@ -1,3 +1,6 @@
+#include "vmlinux0.h"
+#include <bpf/bpf_helpers.h>
+#include <bpf/bpf_endian.h>
 #include "xdp_lbr.h"
 
 struct {
@@ -10,7 +13,6 @@ struct {
 
 static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
 	u32 check = (__force u32)iph->check;
-
 	check += (__force u32)htons(0x0100);
 	iph->check = (__force __sum16)(check + (check >= 0xFFFF));
 	return --iph->ttl;
