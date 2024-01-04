@@ -1,4 +1,6 @@
 #include "xdp_bkd.h"
+#include <bpf/bpf_helpers.h>
+#include <bpf/bpf_endian.h>
 
 SEC("xdp")
 int dispatchworkload(struct xdp_md *ctx) {
