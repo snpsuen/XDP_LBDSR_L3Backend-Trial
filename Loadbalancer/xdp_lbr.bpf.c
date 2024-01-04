@@ -75,7 +75,7 @@ int dispatchworkload(struct xdp_md *ctx) {
         fib_params.ipv4_dst = bpf_ntohl(iph->daddr);
         fib_params.ifindex = ctx->ingress_ifindex;
 		
-		rc = bpf_fib_lookup(ctx, &fib_params, sizeof(fib_params), 0);
+		int rc = bpf_fib_lookup(ctx, &fib_params, sizeof(fib_params), 0);
         bpf_printk("Looked up relevant information in the FIB table with rc %d", rc);
 		
 		if (rc == BPF_FIB_LKUP_RET_SUCCESS) {
