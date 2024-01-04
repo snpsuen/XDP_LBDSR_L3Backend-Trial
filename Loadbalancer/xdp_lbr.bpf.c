@@ -14,7 +14,7 @@ struct {
 
 static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
 	u32 check = (__force u32)iph->check;
-	check += (__force u32)htons(0x0100);
+	check += (__force u32)bpf_htons(0x0100);
 	iph->check = (__force __sum16)(check + (check >= 0xFFFF));
 	return --iph->ttl;
 }
@@ -47,18 +47,18 @@ int dispatchworkload(struct xdp_md *ctx) {
 		forward_key.ip_destination = bpf_ntohl(iph->daddr);
 		forward_key.port_source = bpf_ntohs(tcph->source);
 		forward_key.port_destination = bpf_ntohs(tcph->dest);
-
-        forward_backend = bpf_map_lookup_elem(&forward_flow, &forward_key);
-        if (forward_backend == NULL) {
+		
+		uint32_t* forward_backend = bpf_map_lookup_elem(&forward_flow, &forward_key);
+		if (forward_backend == NULL) {
 			/* backend = BKX + (bpf_get_prandom_u32() % 2); */
 			backend = BKX;
-            bpf_map_update_elem(&forward_flow, &forward_key, &backend, BPF_ANY);
-			bpf_printk("Added a new entry to the forward flow table for the backend ID %d", backend);			
-        }
-        else {
+			bpf_map_update_elem(&forward_flow, &forward_key, &backend, BPF_ANY);
+			bpf_printk("Added a new entry to the forward flow table for the backend ID %d", backend);
+		}
+		else {
 			backend = *forward_backend;
-            bpf_printk("Located the backend ID %d from an existing entry in the forward flow table ", backend);
-        }
+			bpf_printk("Located the backend ID %d from an existing entry in the forward flow table ", backend);
+		}
            
         iph->daddr = bpf_htonl(LADDR18(backend));
 		bpf_printk("Packet to be forwrded to the backend address %x", LADDR18(backend));     
