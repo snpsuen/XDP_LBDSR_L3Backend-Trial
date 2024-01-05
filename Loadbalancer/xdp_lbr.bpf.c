@@ -52,8 +52,7 @@ int dispatchworkload(struct xdp_md *ctx) {
                 uint32_t backend;
                 uint32_t* forward_backend = bpf_map_lookup_elem(&forward_flow, &forward_key);
                 if (forward_backend == NULL) {
-                        /* uint32 backend = BKX + (bpf_get_prandom_u32() % 2); */
-                        backend = BKX;
+                        uint32 backend = BKX + (bpf_get_prandom_u32() % 2);
                         bpf_map_update_elem(&forward_flow, &forward_key, &backend, BPF_ANY);
                         bpf_printk("Added a new entry to the forward flow table for the backend ID %d", backend);
                 }
@@ -62,7 +61,7 @@ int dispatchworkload(struct xdp_md *ctx) {
                         bpf_printk("Found the backend ID %d from an existing entry in the forward flow table ", backend);
                 }
 
-                iph->daddr = bpf_htonl(LADDR18(backend));
+                iph->daddr = bpf_htonl(LADDR19(backend));
                 bpf_printk("Packet to be forwrded to the backend address %x", LADDR18(backend));
 
                 struct bpf_fib_lookup fib_params = {};
