@@ -23,8 +23,8 @@ int dispatchworkload(struct xdp_md *ctx) {
 	if ((void*)tcph + sizeof(struct tcphdr) > data_end)
 		return XDP_ABORTED;
 		
-	if ((bpf_ntohl(iph->daddr) == LADDR18(BKX)) || (bpf_ntohl(iph->daddr) == LADDR18(BKY))) {
-		if (bpf_ntohl(iph->saddr) & LEND(255, 255, 255, 0) != LADDR18(0)) {
+	if ((bpf_ntohl(iph->daddr) == LADDR19(BKX)) || (bpf_ntohl(iph->daddr) == LADDR19(BKY))) {
+		if (bpf_ntohl(iph->saddr) & LEND(255, 255, 255, 0) != LADDR19(0)) {
 			iph->daddr = bpf_htonl(LEND(192, 168, 25, 10));
 			bpf_printk("Packet to be forwrded to the backend address %x", LEND(192, 168, 25, 10));
 		}
