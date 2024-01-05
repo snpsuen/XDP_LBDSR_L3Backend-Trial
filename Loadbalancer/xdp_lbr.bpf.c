@@ -62,7 +62,7 @@ int dispatchworkload(struct xdp_md *ctx) {
                 }
 
                 iph->daddr = bpf_htonl(LADDR19(backend));
-                bpf_printk("Packet to be forwrded to the backend address %x", LADDR18(backend));
+                bpf_printk("Packet to be forwrded to the backend address %x", LADDR19(backend));
 
                 struct bpf_fib_lookup fib_params = {};
                 fib_params.family = AF_INET;
