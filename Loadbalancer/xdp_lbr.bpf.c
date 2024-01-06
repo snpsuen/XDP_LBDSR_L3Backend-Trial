@@ -13,9 +13,9 @@ struct {
         __uint(max_entries, 100000);
 } forward_flow SEC(".maps");
 
-static __always_inline uint8_t* uint2quad(uint32_t number) {
+static __always_inline uint8_t* uint2quad(uint32_t* numptr) {
         uint8_t quad[4];
-        memcpy(quad, &number, 4);
+        memcpy(quad, numptr, 4);
         return quad;
 }
 
@@ -47,7 +47,7 @@ int dispatchworkload(struct xdp_md *ctx) {
         if ((void*)tcph + sizeof(struct tcphdr) > data_end)
                 return XDP_ABORTED;
 
-        if (bpf_ntohl(iph->daddr) == LEND(192, 168, 25, 10)) {
+        if (bpf_ntohl(iph->daddr) == quad2v(192, 168, 25, 10)) {
                 struct five_tuple forward_key = {};
                 forward_key.protocol = iph->protocol;
                 forward_key.ip_source = bpf_ntohl(iph->saddr);
