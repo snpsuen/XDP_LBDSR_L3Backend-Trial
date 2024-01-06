@@ -14,6 +14,11 @@ struct {
 } forward_flow SEC(".maps");
 
 static __always_inline uint8_t* uint2quad(uint32_t* numptr) {
+        uint8_t* quad = (uint8_t*)((void*)numptr);
+        return quad;
+}
+
+static __always_inline uint8_t* uint2quad(uint32_t* numptr) {
         uint8_t* quad = (uint8_t*)calloc(4, sizeof(uint8_t);
         memcpy(quad, numptr, 4);
         return quad;
@@ -107,8 +112,8 @@ int dispatchworkload(struct xdp_md *ctx) {
                         bpf_printk("Before XDP, packet to be forwrded from the source IP Q1.%u.%u.%u  ", saddr[1], saddr[2], saddr[3]);
                         bpf_printk("To the destination IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
                         
-                        bpf_printk("Before XDP_TX, from the source MAC xx:xx:xx:%x:%x:%x  ", eth->h_source[3], eth->h_source[4], eth->source[5]);
-                        bpf_printk("To the destination MAC xx:xx:xx:%x:%x:%x\n", eth->h_dest[3], eth->h_dest[4], eth->dest[5]);
+                        bpf_printk("Before XDP_TX, from the source MAC xx:xx:xx:%x:%x:%x  ", eth->h_source[3], eth->h_source[4], eth->h_source[5]);
+                        bpf_printk("To the destination MAC xx:xx:xx:%x:%x:%x\n", eth->h_dest[3], eth->h_dest[4], eth->h_dest[5]);
                         bpf_printk("Returning XDP_TX ...");
 
                         return XDP_TX;
