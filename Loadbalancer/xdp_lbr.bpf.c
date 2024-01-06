@@ -52,7 +52,7 @@ int dispatchworkload(struct xdp_md *ctx) {
         if ((void*)tcph + sizeof(struct tcphdr) > data_end)
                 return XDP_ABORTED;
 
-        if (bpf_ntohl(iph->daddr) == QUAD2V(192, 168, 25, 10)) {
+        if (bpf_ntohl(iph->daddr) == quad2uint(192, 168, 25, 10)) {
                 struct five_tuple forward_key = {};
                 forward_key.protocol = iph->protocol;
                 forward_key.ip_source = bpf_ntohl(iph->saddr);
@@ -72,7 +72,7 @@ int dispatchworkload(struct xdp_md *ctx) {
                         bpf_printk("Found the backend ID %d from an existing entry in the forward flow table ", backend);
                 }
 
-                iph->daddr = bpf_htonl(VAL19(backend));
+                iph->daddr = bpf_htonl(quad2uint(172, 19, 0, backend));
                 uint8_t* daddr = uint2quad(&(iph->daddr));
                 bpf_printk("Packet to be forwrded to the backend IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
 
