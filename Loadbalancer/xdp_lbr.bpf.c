@@ -68,8 +68,8 @@ int dispatchworkload(struct xdp_md *ctx) {
                 }
 
                 iph->daddr = bpf_htonl(VAL19(backend));
-                uint8_t* addr = uint2quad(&(iph->daddr));
-                bpf_printk("Packet to be forwrded to the backend address Q1.%u.", LADDR19(backend));
+                uint8_t* daddr = uint2quad(&(iph->daddr));
+                bpf_printk("Packet to be forwrded to the backend address Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
 
                 struct bpf_fib_lookup fib_params = {};
                 fib_params.family = AF_INET;
@@ -97,8 +97,13 @@ int dispatchworkload(struct xdp_md *ctx) {
                         /* bpf_printk("Calling fib_params_redirect ...");
                         return bpf_redirect(fib_params.ifindex, 0); */
 
-                        bpf_printk("Before XDP_TX, iph->saddr = %x, iph->daddr = %x", iph->saddr, iph->daddr);
-                        bpf_printk("Before XDP_TX, eth->h_source[5] = %x, eth->h_dest[5] = %x", eth->h_source[5], eth->h_dest[5]);
+                        uint8_t* saddr = uint2quad(&(iph->saddr));
+                        daddr = uint2quad(&(iph->daddr));
+                        bpf_printk("Before XDP, packet to be forwrded from the source IP Q1.%u.%u.%u  ", saddr[1], saddr[2], saddr[3]);
+                        bpf_printk("To the destination IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
+                        
+                        bpf_printk("Before XDP_TX, from the source MAC xx:xx:xx:%x:%x:%x  ", eth->h_source[3], eth->h_source[4], eth->source[5]);
+                        bpf_printk("To the destination MAC xx:xx:xx:%x:%x:%x\n", eth->h_dest[3], eth->h_dest[4], eth->dest[5]);
                         bpf_printk("Returning XDP_TX ...");
 
                         return XDP_TX;
