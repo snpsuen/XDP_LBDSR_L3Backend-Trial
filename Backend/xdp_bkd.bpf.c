@@ -2,6 +2,12 @@
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_endian.h>
 
+static __always_inline uint8_t* uint2quad(uint32_t* numptr) {
+        uint8_t quad[4];
+        memcpy(quad, numptr, 4);
+        return quad;
+}
+
 SEC("xdp")
 int dispatchworkload(struct xdp_md *ctx) {
 	void* data_end = (void*)(long)ctx->data_end;
