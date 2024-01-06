@@ -13,6 +13,12 @@ struct {
         __uint(max_entries, 100000);
 } forward_flow SEC(".maps");
 
+static __always_inline uint8_t* uint2quad(uint32_t number) {
+        uint8_t quad[4];
+        memcpy(quad, &number, 4);
+        return quad;
+}
+
 static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
         u32 check = (__force u32)iph->check;
         check += (__force u32)bpf_htons(0x0100);
