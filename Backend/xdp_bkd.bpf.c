@@ -33,7 +33,7 @@ int dispatchworkload(struct xdp_md *ctx) {
 		if ((bpf_ntohl(iph->saddr) & QUAD2V(255, 255, 255, 0)) != VAL19(0)) {
 			iph->daddr = bpf_htonl(QUAD2V(192, 168, 25, 10));
 			uint8_t* daddr = uint2quad(&(iph->daddr));
-			bpf_printk("Packet to be forwrded to the backend address Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
+			bpf_printk("Packet to be forwrded to the backend IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
 		}
 	}
 		
