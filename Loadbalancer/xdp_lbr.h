@@ -28,9 +28,9 @@
 #define BPF_F_NO_PREALLOC (1U << 0)
 #endif
 
-#define QUAD2N(a, b, c, d) (unsigned int)(a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d)
-#define NET19(x) (unsigned int)(172 * 256 * 256 * 256 + 19 * 256 * 256 + 0 * 256 + x)
-#define NET17(x) (unsigned int)(172 * 256 * 256 * 256 + 17 * 256 * 256 + 0 * 256 + x)
+#define QUAD2V(a, b, c, d) (unsigned int)(a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d)
+#define VAL19(x) (unsigned int)(172 * 256 * 256 * 256 + 19 * 256 * 256 + 0 * 256 + x)
+#define VAL17(x) (unsigned int)(172 * 256 * 256 * 256 + 17 * 256 * 256 + 0 * 256 + x)
 
 #define LBR 2
 #define RTR 3
