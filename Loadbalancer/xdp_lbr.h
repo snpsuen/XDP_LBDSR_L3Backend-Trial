@@ -38,7 +38,6 @@
 #define BKX 3
 #define BKY 4
 
-
 /*
 struct xdp_md {
   __u32 data;
