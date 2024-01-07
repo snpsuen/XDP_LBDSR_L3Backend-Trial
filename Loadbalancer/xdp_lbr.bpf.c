@@ -18,12 +18,6 @@ static __always_inline uint8_t* uint2quad(uint32_t* numptr) {
         return quad;
 }
 
-static __always_inline uint8_t* uint2quad(uint32_t* numptr) {
-        uint8_t* quad = (uint8_t*)calloc(4, sizeof(uint8_t);
-        memcpy(quad, numptr, 4);
-        return quad;
-}
-
 static __always_inline uint32_t quad2uint(uint8_t quad0, uint8_t quad1, uint8_t quad2, uint8_t quad3) {
         uint32_t result = quad0 * 256 * 256 * 256 + quad1 * 256 * 256 + quad2 * 256 + quad3;
         return result;
