@@ -90,9 +90,15 @@ int dispatchworkload(struct xdp_md *ctx) {
                 bpf_printk("Looked up relevant information in the FIB table with rc %d", rc);
 
                 if (rc == BPF_FIB_LKUP_RET_SUCCESS) {
-                        bpf_printk("Found fib_params.dmac = %x:%x:%x", fib_params.dmac[3], fib_params.dmac[4], fib_params.dmac[5]);
-                        bpf_printk("Found fib_params.smac = %x:%x:%x", fib_params.smac[3], fib_params.smac[4], fib_params.smac[5]);
+                        bpf_printk("Found fib_params.dmac[0-2] = %x:%x:%x", fib_params.dmac[0], fib_params.dmac[1], fib_params.dmac[2]);
+                        bpf_printk("Found fib_params.dmac[3-5] = %x:%x:%x\n", fib_params.dmac[3], fib_params.dmac[4], fib_params.dmac[5]);
+                        bpf_printk("Found fib_params.smac[0-2] = %x:%x:%x", fib_params.smac[0], fib_params.smac[1], fib_params.smac[2]);
+                        bpf_printk("Found fib_params.smac[3-5] = %x:%x:%x\n", fib_params.smac[3], fib_params.smac[4], fib_params.smac[5]);
 
+                        uint32_t nexthop = bpf_htonl(fib_params.ipv4_dst);
+                        uint8_t* nhaddr = uint2quad(&nexthop);
+                        bpf_printk("Found FIB nexthop IP Q1.%u.%u.%u\n", nhaddr[1], nhaddr[2], nhaddr[3]);
+                        
                         /* ip_decrease_ttl(iph); */
                         ip_decrease_ttl(iph);
                         memcpy(eth->h_dest, fib_params.dmac, ETH_ALEN);
