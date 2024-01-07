@@ -99,6 +99,8 @@ int dispatchworkload(struct xdp_md *ctx) {
                         uint8_t* nhaddr = uint2quad(&nexthop);
                         bpf_printk("Found FIB nexthop IP Q1: %u", nhaddr[0]);
                         bpf_printk("Found FIB nexthop IP Q1.%u.%u.%u\n", nhaddr[1], nhaddr[2], nhaddr[3]);
+                        bpf_printk("Found FIB ifindex %u\n", fib_params.ifindex);
+                        
                         
                         /* ip_decrease_ttl(iph);
                         ip_decrease_ttl(iph);
