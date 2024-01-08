@@ -74,7 +74,7 @@ int dispatchworkload(struct xdp_md *ctx) {
                 uint32_t iphdaddr = bpf_htonl(quad2uint(172, 19, 0, backend));
                 uint8_t* destquad = uint2quad(&(iphdaddr));
                 bpf_printk("Packet would be dispatched to the backend IP Q1: %u", destquad[0]);
-                bpf_printk("Packet is destined to the backend IP Q1.%u.%u.%u\n", destquad[1], destquad[2], destquad[3]);
+                bpf_printk("Packet would be dispatched to the backend IP Q1.%u.%u.%u\n", destquad[1], destquad[2], destquad[3]);
                 
                 struct bpf_fib_lookup fib_params = {};
                 fib_params.family = AF_INET;
