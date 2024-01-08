@@ -112,10 +112,14 @@ int dispatchworkload(struct xdp_md *ctx) {
 
                         uint8_t* saddr = uint2quad(&(iph->saddr));
                         uint8_t* daddr = uint2quad(&(iph->daddr));
-                        bpf_printk("Before XDP, packet to be forwrded from the source IP Q1.%u.%u.%u ", saddr[1], saddr[2], saddr[3]);
+                        bpf_printk("Before XDP_TX, packet is to be transported from the source IP Q1: %u ", saddr[0]);
+                        bpf_printk("Before XDP_TX, packet is to be transported from the source IP Q1.%u.%u.%u\n", saddr[1], saddr[2], saddr[3]);
+                        bpf_printk("To the destination IP Q1: %u ", daddr[0]);
                         bpf_printk("To the destination IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
                         
-                        bpf_printk("Before XDP_TX, from the source MAC xx:xx:xx:%x:%x:%x ", eth->h_source[3], eth->h_source[4], eth->h_source[5]);
+                        bpf_printk("Before XDP_TX, from the source MAC %x:%x:%x:xx:xx:xx", eth->h_source[0], eth->h_source[1], eth->h_source[2]);
+                        bpf_printk("Before XDP_TX, from the source MAC xx:xx:xx:%x:%x:%x\n", eth->h_source[3], eth->h_source[4], eth->h_source[5]);
+                        bpf_printk("To the destination MAC %x:%x:%x:xx:xx:xx", eth->h_dest[0], eth->h_dest[1], eth->h_dest[2]);
                         bpf_printk("To the destination MAC xx:xx:xx:%x:%x:%x\n", eth->h_dest[3], eth->h_dest[4], eth->h_dest[5]);
                         bpf_printk("Returning XDP_TX ...");
 
