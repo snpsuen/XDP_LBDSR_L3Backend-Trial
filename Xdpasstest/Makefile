@@ -8,10 +8,10 @@ BPF_C = ${BPF_TARGET:=.c}
 BPF_OBJ = ${BPF_C:.c=.o}
 
 all: $(BPF_OBJ)
-	bpftool net detach xdpgeneric dev eth0
+	bpftool net detach xdpgeneric dev eth1
 	rm -f /sys/fs/bpf/$(SEC)
 	bpftool prog load $(BPF_OBJ) /sys/fs/bpf/$(SEC)
-	bpftool net attach xdpgeneric pinned /sys/fs/bpf/$(SEC) dev eth0 
+	bpftool net attach xdpgeneric pinned /sys/fs/bpf/$(SEC) dev eth1 
 
 $(BPF_OBJ): $(BPF_C) vmlinux.h
 	$(CLANG) $(CFLAGS) -target bpf -c $<
@@ -20,7 +20,7 @@ vmlinux.h:
 	bpftool btf dump file /sys/kernel/btf/vmlinux format c > $@
 
 clean:
-	bpftool net detach xdpgeneric dev eth0
+	bpftool net detach xdpgeneric dev eth1
 	rm -f /sys/fs/bpf/$(SEC)
 	rm -f $(BPF_OBJ)
 	rm -f vmlinux.h
