@@ -72,7 +72,7 @@ int dispatchworkload(struct xdp_md *ctx) {
                 }
 
                 iph->daddr = bpf_htonl(quad2uint(172, 19, 0, backend));
-                uint8_t* daddr = uint2quad(&(iph->daddr));
+                uint8_t* destquad = uint2quad(&(iph->daddr));
                 bpf_printk("Packet is to be dispatched to the backend IP Q1: %u", destquad[0]);
                 bpf_printk("Packet is to be displatched the backend IP Q1.%u.%u.%u\n", destquad[1], destquad[2], destquad[3]);
 
@@ -111,7 +111,7 @@ int dispatchworkload(struct xdp_md *ctx) {
                         return bpf_redirect(fib_params.ifindex, 0); */
 
                         uint8_t* saddr = uint2quad(&(iph->saddr));
-                        daddr = uint2quad(&(iph->daddr));
+                        uint8_t* daddr = uint2quad(&(iph->daddr));
                         bpf_printk("Before XDP, packet to be forwrded from the source IP Q1.%u.%u.%u ", saddr[1], saddr[2], saddr[3]);
                         bpf_printk("To the destination IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
                         
