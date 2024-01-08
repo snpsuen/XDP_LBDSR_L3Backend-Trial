@@ -70,36 +70,37 @@ int dispatchworkload(struct xdp_md *ctx) {
                         backend = *forward_backend;
                         bpf_printk("Found the backend ID %d from an existing entry in the forward flow table ", backend);
                 }
-        }
 
-        uint8_t* daddr = uint2quad(&(iph->daddr));
-        bpf_printk("Packet is currently destined to the IP Q1: %u", daddr[0]);
-        bpf_printk("Packet is destined to the IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
+                uint32_t iphdaddr = bpf_htonl(quad2uint(172, 19, 0, backend));
+                uint8_t* destquad = uint2quad(&(iphdaddr));
+                bpf_printk("Packet would be dispatched to the backend IP Q1: %u", destquad[0]);
+                bpf_printk("Packet is destined to the backend IP Q1.%u.%u.%u\n", destquad[1], destquad[2], destquad[3]);
+                
+                struct bpf_fib_lookup fib_params = {};
+                fib_params.family = AF_INET;
+                fib_params.tos = iph->tos;
+                fib_params.l4_protocol = iph->protocol;
+                fib_params.sport = 0;
+                fib_params.dport = 0;
+                fib_params.tot_len = bpf_ntohs(iph->tot_len);
+                fib_params.ipv4_src = iph->saddr;
+                fib_params.ipv4_dst = iphdaddr;
+                fib_params.ifindex = ctx->ingress_ifindex;
+        
+                int rc = bpf_fib_lookup(ctx, &fib_params, sizeof(fib_params), 0);
+                bpf_printk("Looked up relevant information in the FIB table with rc %d", rc);
 
-        struct bpf_fib_lookup fib_params = {};
-        fib_params.family = AF_INET;
-        fib_params.tos = iph->tos;
-        fib_params.l4_protocol = iph->protocol;
-        fib_params.sport = 0;
-        fib_params.dport = 0;
-        fib_params.tot_len = bpf_ntohs(iph->tot_len);
-        fib_params.ipv4_src = iph->saddr;
-        fib_params.ipv4_dst = iph->daddr;
-        fib_params.ifindex = ctx->ingress_ifindex;
-        int rc = bpf_fib_lookup(ctx, &fib_params, sizeof(fib_params), 0);
-        bpf_printk("Looked up relevant information in the FIB table with rc %d", rc);
-
-        if (rc == BPF_FIB_LKUP_RET_SUCCESS) {
-                bpf_printk("Found fib_params.dmac[0-2] = %x:%x:%x", fib_params.dmac[0], fib_params.dmac[1], fib_params.dmac[2]);
-                bpf_printk("Found fib_params.dmac[3-5] = %x:%x:%x\n", fib_params.dmac[3], fib_params.dmac[4], fib_params.dmac[5]);
-                bpf_printk("Found fib_params.smac[0-2] = %x:%x:%x", fib_params.smac[0], fib_params.smac[1], fib_params.smac[2]);
-                bpf_printk("Found fib_params.smac[3-5] = %x:%x:%x\n", fib_params.smac[3], fib_params.smac[4], fib_params.smac[5]);
-
-                uint32_t nexthop = fib_params.ipv4_dst;
-                uint8_t* nhaddr = uint2quad(&nexthop);
-                bpf_printk("Found FIB nexthop IP Q1: %u", nhaddr[0]);
-                bpf_printk("Found FIB nexthop IP Q1.%u.%u.%u\n", nhaddr[1], nhaddr[2], nhaddr[3]);
-                bpf_printk("Found FIB ifindex %u\n", fib_params.ifindex);
+                if (rc == BPF_FIB_LKUP_RET_SUCCESS) {
+                        bpf_printk("Found fib_params.dmac[0-2] = %x:%x:%x", fib_params.dmac[0], fib_params.dmac[1], fib_params.dmac[2]);
+                        bpf_printk("Found fib_params.dmac[3-5] = %x:%x:%x\n", fib_params.dmac[3], fib_params.dmac[4], fib_params.dmac[5]);
+                        bpf_printk("Found fib_params.smac[0-2] = %x:%x:%x", fib_params.smac[0], fib_params.smac[1], fib_params.smac[2]);
+                        bpf_printk("Found fib_params.smac[3-5] = %x:%x:%x\n", fib_params.smac[3], fib_params.smac[4], fib_params.smac[5]);
+                        
+                        uint32_t nexthop = fib_params.ipv4_dst;
+                        uint8_t* nhaddr = uint2quad(&nexthop);
+                        bpf_printk("Found FIB nexthop IP Q1: %u", nhaddr[0]);
+                        bpf_printk("Found FIB nexthop IP Q1.%u.%u.%u\n", nhaddr[1], nhaddr[2], nhaddr[3]);
+                        bpf_printk("Found FIB ifindex %u\n", fib_params.ifindex);
                             
                         /* ip_decrease_ttl(iph);
                         ip_decrease_ttl(iph);
@@ -117,8 +118,9 @@ int dispatchworkload(struct xdp_md *ctx) {
                         bpf_printk("Before XDP_TX, from the source MAC xx:xx:xx:%x:%x:%x  ", eth->h_source[3], eth->h_source[4], eth->h_source[5]);
                         bpf_printk("To the destination MAC xx:xx:xx:%x:%x:%x\n", eth->h_dest[3], eth->h_dest[4], eth->h_dest[5]);
                         bpf_printk("Returning XDP_TX ...");
-
-                return XDP_TX; */
+                        
+                        return XDP_TX; */
+                }
         }
         
         return XDP_PASS;
