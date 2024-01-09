@@ -39,6 +39,9 @@ int dispatchworkload(struct xdp_md *ctx) {
 			uint8_t* daddr = uint2quad(&(iph->daddr));
 			bpf_printk("Backend>> Packet to be dispatched to the backend IP Q1: %u ", daddr[0]);
 			bpf_printk("Backend>> Packet to be dispatched to the backend IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
+			
+			iph->check = iph_csum(iph);
+			iph->ttl--;
 		}
 	}
 		
