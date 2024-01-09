@@ -33,8 +33,8 @@
 #define VAL17(x) (unsigned int)(172 * 256 * 256 * 256 + 17 * 256 * 256 + 0 * 256 + x)
 
 #define LBR 2
-#define RTR 4
-#define CUR 3
+#define RTR 3
+#define CUR 4
 #define BKX 3
 #define BKY 4
 
