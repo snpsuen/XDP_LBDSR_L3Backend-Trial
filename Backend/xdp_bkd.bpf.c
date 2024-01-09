@@ -12,7 +12,12 @@ static __always_inline uint32_t quad2uint(uint8_t quad0, uint8_t quad1, uint8_t 
         return result;
 }
 
-
+static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
+        u32 check = (__force u32)iph->check;
+        check += (__force u32)bpf_htons(0x0100);
+        iph->check = (__force __sum16)(check + (check >= 0xFFFF));
+        return --iph->ttl;
+}
 
 /* static __always_inline __u16 csum_fold_helper(__u64 csum) {
     int i;
@@ -58,8 +63,7 @@ int dispatchworkload(struct xdp_md *ctx) {
 			bpf_printk("Backend>> Packet to be dispatched to the backend IP Q1: %u ", daddr[0]);
 			bpf_printk("Backend>> Packet to be dispatched to the backend IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
 			
-			iph->check = iph_csum(iph);
-			iph->ttl--;
+			ip_decrease_ttl(struct iphdr *iph);
 		}
 	}
 		
