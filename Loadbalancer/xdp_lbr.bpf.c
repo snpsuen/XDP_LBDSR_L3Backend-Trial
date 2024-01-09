@@ -102,8 +102,11 @@ int dispatchworkload(struct xdp_md *ctx) {
                         bpf_printk("Found FIB nexthop IP Q1.%u.%u.%u\n", nhaddr[1], nhaddr[2], nhaddr[3]);
                         bpf_printk("Found FIB ifindex %u\n", fib_params.ifindex);
                         
-                        /* ip_decrease_ttl(iph); */
-                        ip_decrease_ttl(iph);
+                        /* ip_decrease_ttl(iph);
+                        ip_decrease_ttl(iph); */
+
+                        iph->check = iph_csum(iph);
+                        iph->ttl--;
                         memcpy(eth->h_dest, fib_params.dmac, ETH_ALEN);
                         memcpy(eth->h_source, fib_params.smac, ETH_ALEN);
 
