@@ -87,10 +87,10 @@ int dispatchworkload(struct xdp_md *ctx) {
                         bpf_printk("Found the backend ID %d from an existing entry in the forward flow table ", backend);
                 }
 
-                iph->daddr = bpf_htonl(quad2uint(172, 19, 0, backend));
-                uint8_t* destquad = uint2quad(&(iph->daddr));
-                bpf_printk("Packet is to be dispatched to the backend IP Q1: %u", destquad[0]);
-                bpf_printk("Packet is to be displatched the backend IP Q1.%u.%u.%u\n", destquad[1], destquad[2], destquad[3]);
+                uint32_t iphdaddr = bpf_htonl(quad2uint(172, 19, 0, backend));
+                uint8_t* destquad = uint2quad(&(iphdaddr));
+                bpf_printk("Packet would have to be dispatched to the backend IP Q1: %u", destquad[0]);
+                bpf_printk("Packet would have to displatched the backend IP Q1.%u.%u.%u\n", destquad[1], destquad[2], destquad[3]);
 
                 struct bpf_fib_lookup fib_params = {};
                 fib_params.family = AF_INET;
@@ -118,8 +118,8 @@ int dispatchworkload(struct xdp_md *ctx) {
                         bpf_printk("Found FIB nexthop IP Q1.%u.%u.%u\n", nhaddr[1], nhaddr[2], nhaddr[3]);
                         bpf_printk("Found FIB ifindex %u\n", fib_params.ifindex);
                         
-                        /* ip_decrease_ttl(iph); */
-                        ip_decrease_ttl(iph);
+                        /* ip_decrease_ttl(iph);
+                        ip_decrease_ttl(iph); */
 
                         /* iph->check = iph_csum(iph);
                         iph->ttl--; */
@@ -132,18 +132,18 @@ int dispatchworkload(struct xdp_md *ctx) {
 
                         uint8_t* saddr = uint2quad(&(iph->saddr));
                         uint8_t* daddr = uint2quad(&(iph->daddr));
-                        bpf_printk("Before bpf_redirect, packet is to be transported from the source IP Q1: %u ", saddr[0]);
-                        bpf_printk("Before bpf_redirect, packet is to be transported from the source IP Q1.%u.%u.%u\n", saddr[1], saddr[2], saddr[3]);
+                        bpf_printk("Before XDP_TX, packet is to be transported from the source IP Q1: %u ", saddr[0]);
+                        bpf_printk("Before XDP_TX, packet is to be transported from the source IP Q1.%u.%u.%u\n", saddr[1], saddr[2], saddr[3]);
                         bpf_printk("To the destination IP Q1: %u ", daddr[0]);
                         bpf_printk("To the destination IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
                         
-                        bpf_printk("Before bpf_redirect, from the source MAC %x:%x:%x:xx:xx:xx", eth->h_source[0], eth->h_source[1], eth->h_source[2]);
-                        bpf_printk("Before bpf_redirect, from the source MAC xx:xx:xx:%x:%x:%x\n", eth->h_source[3], eth->h_source[4], eth->h_source[5]);
+                        bpf_printk("Before XDP_TX, from the source MAC %x:%x:%x:xx:xx:xx", eth->h_source[0], eth->h_source[1], eth->h_source[2]);
+                        bpf_printk("Before XDP_TX, from the source MAC xx:xx:xx:%x:%x:%x\n", eth->h_source[3], eth->h_source[4], eth->h_source[5]);
                         bpf_printk("To the destination MAC %x:%x:%x:xx:xx:xx", eth->h_dest[0], eth->h_dest[1], eth->h_dest[2]);
                         bpf_printk("To the destination MAC xx:xx:xx:%x:%x:%x\n", eth->h_dest[3], eth->h_dest[4], eth->h_dest[5]);
-                        bpf_printk("Returning bpf_redirect ...");
+                        bpf_printk("Returning XDP_TX ...");
 
-                        return bpf_redirect(fib_params.ifindex, 0);
+                        return XDP_TX;
                 }
         }
 
