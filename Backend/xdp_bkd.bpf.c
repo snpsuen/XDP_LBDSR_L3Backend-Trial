@@ -60,8 +60,8 @@ int dispatchworkload(struct xdp_md *ctx) {
 		if ((bpf_ntohl(iph->saddr) & quad2uint(255, 255, 255, 0)) != quad2uint(172, 19, 0, 0)) {
 			iph->daddr = bpf_htonl(quad2uint(192, 168, 25, 10));
 			uint8_t* daddr = uint2quad(&(iph->daddr));
-			bpf_printk("Backend>> Packet to be dispatched to the backend IP Q1: %u ", daddr[0]);
-			bpf_printk("Backend>> Packet to be dispatched to the backend IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
+			bpf_printk("Backend>> Packet is to be dispatched to the backend IP Q1: %u ", daddr[0]);
+			bpf_printk("Backend>> Packet is to be dispatched to the backend IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
 			
 			iph->check = iph_csum(iph);
 		}
