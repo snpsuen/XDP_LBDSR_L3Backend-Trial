@@ -12,14 +12,14 @@ static __always_inline uint32_t quad2uint(uint8_t quad0, uint8_t quad1, uint8_t 
         return result;
 }
 
-static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
+/* static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
         u32 check = (__force u32)iph->check;
         check += (__force u32)bpf_htons(0x0100);
         iph->check = (__force __sum16)(check + (check >= 0xFFFF));
         return --iph->ttl;
-}
+} */
 
-/* static __always_inline __u16 csum_fold_helper(__u64 csum) {
+static __always_inline __u16 csum_fold_helper(__u64 csum) {
     int i;
 #pragma unroll
     for (i = 0; i < 4; i++) {
@@ -27,13 +27,13 @@ static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
             csum = (csum & 0xffff) + (csum >> 16);
     }
     return ~csum;
-};
+}
 
 static __always_inline __u16 iph_csum(struct iphdr *iph) {
     iph->check = 0;
     unsigned long long csum = bpf_csum_diff(0, 0, (unsigned int *)iph, sizeof(struct iphdr), 0);
     return csum_fold_helper(csum);
-}; */
+}
 
 SEC("xdp")
 int dispatchworkload(struct xdp_md *ctx) {
@@ -63,7 +63,7 @@ int dispatchworkload(struct xdp_md *ctx) {
 			bpf_printk("Backend>> Packet to be dispatched to the backend IP Q1: %u ", daddr[0]);
 			bpf_printk("Backend>> Packet to be dispatched to the backend IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
 			
-			ip_decrease_ttl(struct iphdr *iph);
+			iph->check = iph_csum(iph);
 		}
 	}
 		
