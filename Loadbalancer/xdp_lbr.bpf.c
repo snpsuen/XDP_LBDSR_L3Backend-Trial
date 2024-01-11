@@ -23,7 +23,7 @@ static __always_inline uint32_t quad2uint(uint8_t quad0, uint8_t quad1, uint8_t 
         return result;
 };
 
-/* static __always_inline __u16 csum_fold_helper(__u64 csum) {
+static __always_inline __u16 csum_fold_helper(__u64 csum) {
     int i;
 #pragma unroll
     for (i = 0; i < 4; i++) {
@@ -37,14 +37,14 @@ static __always_inline __u16 iph_csum(struct iphdr *iph) {
     iph->check = 0;
     unsigned long long csum = bpf_csum_diff(0, 0, (unsigned int *)iph, sizeof(struct iphdr), 0);
     return csum_fold_helper(csum);
-}; */
+};
 
-static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
+/* static __always_inline int ip_decrease_ttl(struct iphdr *iph) {
         u32 check = (__force u32)iph->check;
         check += (__force u32)bpf_htons(0x0100);
         iph->check = (__force __sum16)(check + (check >= 0xFFFF));
         return --iph->ttl;
-}
+} */
 
 SEC("xdp")
 int dispatchworkload(struct xdp_md *ctx) {
@@ -117,13 +117,13 @@ int dispatchworkload(struct xdp_md *ctx) {
                         bpf_printk("Found FIB nexthop IP Q1: %u", nhaddr[0]);
                         bpf_printk("Found FIB nexthop IP Q1.%u.%u.%u\n", nhaddr[1], nhaddr[2], nhaddr[3]);
                         bpf_printk("Found FIB ifindex %u\n", fib_params.ifindex);
-                        
-                        /* ip_decrease_ttl(iph); */
-                        ip_decrease_ttl(iph);
 
-                        /* iph->check = iph_csum(iph);
-                        iph->ttl--; */
-                        
+                        /* ip_decrease_ttl(iph);
+                        ip_decrease_ttl(iph); */
+
+                        iph->check = iph_csum(iph);
+                        /* iph->ttl--; */
+
                         memcpy(eth->h_dest, fib_params.dmac, ETH_ALEN);
                         memcpy(eth->h_source, fib_params.smac, ETH_ALEN);
 
@@ -132,18 +132,18 @@ int dispatchworkload(struct xdp_md *ctx) {
 
                         uint8_t* saddr = uint2quad(&(iph->saddr));
                         uint8_t* daddr = uint2quad(&(iph->daddr));
-                        bpf_printk("Before bpf_redirect, packet is to be transported from the source IP Q1: %u ", saddr[0]);
-                        bpf_printk("Before bpf_redirect, packet is to be transported from the source IP Q1.%u.%u.%u\n", saddr[1], saddr[2], saddr[3]);
+                        bpf_printk("Before XDP_TX, packet is to be transported from the source IP Q1: %u ", saddr[0]);
+                        bpf_printk("Before XDP_TX, packet is to be transported from the source IP Q1.%u.%u.%u\n", saddr[1], saddr[2], saddr[3]);
                         bpf_printk("To the destination IP Q1: %u ", daddr[0]);
                         bpf_printk("To the destination IP Q1.%u.%u.%u\n", daddr[1], daddr[2], daddr[3]);
-                        
-                        bpf_printk("Before bpf_redirect, from the source MAC %x:%x:%x:xx:xx:xx", eth->h_source[0], eth->h_source[1], eth->h_source[2]);
-                        bpf_printk("Before bpf_redirect, from the source MAC xx:xx:xx:%x:%x:%x\n", eth->h_source[3], eth->h_source[4], eth->h_source[5]);
+
+                        bpf_printk("Before XDP_TX, from the source MAC %x:%x:%x:xx:xx:xx", eth->h_source[0], eth->h_source[1], eth->h_source[2]);
+                        bpf_printk("Before XDP_TX, from the source MAC xx:xx:xx:%x:%x:%x\n", eth->h_source[3], eth->h_source[4], eth->h_source[5]);
                         bpf_printk("To the destination MAC %x:%x:%x:xx:xx:xx", eth->h_dest[0], eth->h_dest[1], eth->h_dest[2]);
                         bpf_printk("To the destination MAC xx:xx:xx:%x:%x:%x\n", eth->h_dest[3], eth->h_dest[4], eth->h_dest[5]);
-                        bpf_printk("Returning bpf_redirect ...");
+                        bpf_printk("Returning XDP_TX...");
 
-                        return bpf_redirect(fib_params.ifindex, 0);
+                        return XDP_TX;
                 }
         }
 
